@@ -1,0 +1,19 @@
+FROM python:3.12-slim
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends unzip wget && \
+    wget -q "https://github.com/rsms/inter/releases/download/v4.0/Inter-4.0.zip" -O /tmp/inter.zip && \
+    mkdir -p /tmp/inter && unzip -q /tmp/inter.zip -d /tmp/inter && \
+    mkdir -p /usr/share/fonts/truetype/inter && \
+    find /tmp/inter -name "*.ttf" -exec cp {} /usr/share/fonts/truetype/inter/ \; && \
+    rm -rf /tmp/inter /tmp/inter.zip && \
+    apt-get remove -y wget unzip && \
+    rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY bot.py .
+
+CMD ["python", "bot.py"]
